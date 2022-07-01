@@ -51,7 +51,6 @@ struct RecordAudioModel {
     func stopRecording() {
         recorder?.stop()
         delegate?.recordDidComplete(success: true, reason: nil)
-        print("URL: \(recorder!.url)")
     }
 
     var url: URL? {

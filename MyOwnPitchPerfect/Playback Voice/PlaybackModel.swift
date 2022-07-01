@@ -115,6 +115,7 @@ class PlaybackModel {
                 RunLoop.main.add(self.stopTimer!, forMode: RunLoop.Mode.default)
             }
 
+            try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
             try audioEngine.start()
         } catch {
             delegate.showAlert(Alerts.AudioEngineError, message: String(describing: error))

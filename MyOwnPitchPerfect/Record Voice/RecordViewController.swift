@@ -18,7 +18,7 @@ class RecordViewController: UIViewController {
     var spinner: UIActivityIndicatorView!
 
     enum UIState {
-        case initialLoading, recording, notRecording
+        case initialLoading, recording, notRecording, blocked
     }
 
     override func viewDidLoad() {
@@ -81,6 +81,19 @@ class RecordViewController: UIViewController {
                 self.recordButton.alpha = 1
                 self.stopRecordingButton.alpha = 0.5
             })
+        case .blocked:
+            spinner.stopAnimating()
+            buttonsStackView.alpha = 1
+            recordButton.isEnabled = false
+            stopRecordingButton.isEnabled = false
+            recordingLabel.numberOfLines = 0
+            recordingLabel.textAlignment = .center
+            recordingLabel.text = "Can't access microphone.\n Please grant access on Preferences."
+            UIView.animate(withDuration: 0.25, delay: 0, animations: {
+                self.recordingLabel.alpha = 1
+                self.recordButton.alpha = 0.5
+                self.stopRecordingButton.alpha = 0.5
+            })
         }
     }
 
@@ -95,10 +108,18 @@ class RecordViewController: UIViewController {
 
 extension RecordViewController: RecordAudioModelDelegate {
     func initDidComplete(success: Bool, reason: String?) {
-        updateUI(.notRecording)
+        DispatchQueue.main.async {
+            if success {
+                self.updateUI(.notRecording)
+            } else {
+                self.updateUI(.blocked)
+            }
+        }
     }
 
     func recordDidComplete(success: Bool, reason: String?) {
-        updateUI(.notRecording)
+        DispatchQueue.main.async {
+            self.updateUI(.notRecording)
+        }
     }
 }
