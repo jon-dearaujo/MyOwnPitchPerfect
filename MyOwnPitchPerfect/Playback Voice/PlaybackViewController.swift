@@ -12,6 +12,8 @@ class PlaybackViewController: UIViewController {
     var playbackModel: PlaybackModel!
     let BUTTON_SIZE = 120.0
     var buttons: [String: UIButton] = [:]
+    var wideConstraints: [NSLayoutConstraint]!
+    var narrowConstraints: [NSLayoutConstraint]!
 
     enum Buttons: String, CaseIterable {
         case fast, slow, high, low, echo, reverb
@@ -29,10 +31,7 @@ class PlaybackViewController: UIViewController {
         containerStackView.alignment = .center
         containerStackView.distribution = .fillEqually
         containerStackView.translatesAutoresizingMaskIntoConstraints = false
-        containerStackView.topAnchor
-            .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20.0).isActive = true
-        containerStackView.leadingAnchor
-            .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+
         containerStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
 
         let stopButton = UIButton(frame: containerStackView.frame)
@@ -42,14 +41,32 @@ class PlaybackViewController: UIViewController {
             .constraint(equalToConstant: BUTTON_SIZE).isActive = true
         stopButton.heightAnchor
             .constraint(equalToConstant: BUTTON_SIZE).isActive = true
-        stopButton.topAnchor
-            .constraint(equalTo: containerStackView.bottomAnchor, constant: 20.0).isActive = true
-        stopButton.bottomAnchor
-            .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20.0).isActive = true
-        stopButton.centerXAnchor
-            .constraint(equalTo: view.centerXAnchor).isActive = true
+
         stopButton.setImage(UIImage(named: "Stop"), for: .normal)
         stopButton.addTarget(self, action: #selector(stopButtonClicked), for: .touchUpInside)
+
+
+        narrowConstraints = [
+            containerStackView.topAnchor
+                .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8.0),
+            containerStackView.leadingAnchor
+                .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            stopButton.topAnchor
+                .constraint(equalTo: containerStackView.bottomAnchor, constant: 8.0),
+            stopButton.centerXAnchor
+                .constraint(equalTo: view.centerXAnchor),
+            stopButton.bottomAnchor
+                .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20.0),
+        ]
+
+        wideConstraints = [
+            stopButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20.0),
+            stopButton.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            containerStackView.topAnchor
+                .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4.0),
+            containerStackView.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor),
+            containerStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 4.0),
+        ]
 
         var horizontalStackView: UIStackView?
         Buttons.allCases.enumerated().forEach { (index, buttonName) in
@@ -65,16 +82,39 @@ class PlaybackViewController: UIViewController {
             let button = UIButton(frame: horizontalStackView!.frame)
             horizontalStackView!.addArrangedSubview(button)
             button.translatesAutoresizingMaskIntoConstraints = false
-            button.widthAnchor
-                .constraint(equalToConstant: BUTTON_SIZE).isActive = true
-            button.heightAnchor
-                .constraint(equalToConstant: BUTTON_SIZE).isActive = true
             button.titleLabel?.text = buttonName.rawValue
             button.contentHorizontalAlignment = .fill
             button.contentVerticalAlignment = .fill
             button.setImage(UIImage(named: buttonName.rawValue.capitalized), for: .normal)
             button.addTarget(self, action: #selector(playbackButtonClicked), for: .touchUpInside)
             buttons[buttonName.rawValue] = button
+
+            narrowConstraints.append(button.widthAnchor.constraint(equalToConstant: BUTTON_SIZE))
+            narrowConstraints.append(button.heightAnchor.constraint(equalToConstant: BUTTON_SIZE))
+            wideConstraints.append(button.widthAnchor.constraint(lessThanOrEqualToConstant: BUTTON_SIZE))
+            wideConstraints.append(button.heightAnchor.constraint(lessThanOrEqualToConstant: BUTTON_SIZE))
+        }
+
+        if view.frame.width > view.frame.height {
+            NSLayoutConstraint.deactivate(narrowConstraints)
+            NSLayoutConstraint.activate(wideConstraints)
+        } else {
+            NSLayoutConstraint.deactivate(wideConstraints)
+            NSLayoutConstraint.activate(narrowConstraints)
+        }
+
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate {_ in
+            if self.view.frame.width > self.view.frame.height {
+                NSLayoutConstraint.deactivate(self.narrowConstraints)
+                NSLayoutConstraint.activate(self.wideConstraints)
+            } else {
+                NSLayoutConstraint.deactivate(self.wideConstraints)
+                NSLayoutConstraint.activate(self.narrowConstraints)
+            }
         }
     }
 

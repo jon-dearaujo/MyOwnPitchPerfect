@@ -69,7 +69,7 @@
                         <outlet property="recordButton" destination="qVm-Ks-rRJ" id="LuH-mT-vJj"/>
                         <outlet property="recordingLabel" destination="3C6-iD-QC3" id="qxc-TC-p0d"/>
                         <outlet property="stopRecordingButton" destination="jhN-5v-naD" id="k6N-Bi-kcq"/>
-                        <segue destination="e1m-I1-yUo" kind="presentation" identifier="SoundPlayback" modalTransitionStyle="coverVertical" id="ASP-r3-sjL"/>
+                        <segue destination="e1m-I1-yUo" kind="show" identifier="SoundPlayback" id="ASP-r3-sjL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -81,7 +81,7 @@
             <objects>
                 <viewController id="e1m-I1-yUo" customClass="PlaybackViewController" customModule="MyOwnPitchPerfect" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="CfC-ma-MuJ">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="dJV-Rb-06B"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
